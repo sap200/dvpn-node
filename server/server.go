@@ -27,7 +27,6 @@ func LaunchServer() {
 		}
 		go handleConnection(conn)
 	}
-
 }
 
 func handleConnection(conn net.Conn) {
