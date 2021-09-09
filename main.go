@@ -1,9 +1,13 @@
 // Package main
 package main
 
+import "utils"
 // Aashin's part
 
 func main() {
+
+
+	utils.InstallOpenvpn()
 	// TODO: take the command line argument 
 	// for now no command line args
 	// just call the install openvpn function
