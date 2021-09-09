@@ -9,7 +9,7 @@ func executeSystemCommand(command []string) bool {
     var out bytes.Buffer
     var err bytes.Buffer // modified
 
-    cmd := exec.Command(...command)
+    cmd := exec.Command(command[0], command[:1]...)
     cmd.Stdout = &out
     cmd.Stderr = &err // modified
 
