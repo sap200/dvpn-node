@@ -13,8 +13,7 @@ import (
 ) 
 
 func LaunchServer() {
-	
-
+	// log the server start
 	fmt.Printf("Node started at port %s\n", utils.PORT)
 
 	ln, err := net.Listen("tcp", ":" + utils.PORT)
