@@ -14,7 +14,8 @@ func executeSystemCommand(command []string) bool {
 	cmd.Stderr = &err // modified
 	cmd.Run()
 	
-    if strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG1) || strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG2) {
+	if strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG1) || 
+	strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG2) {
 		return true
 	} else {
 		return false
