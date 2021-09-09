@@ -17,7 +17,10 @@ func main() {
 	// else print something went wrong...
 
 	// install and start openvpn as a service 
-	utils.InstallOpenvpn()
+	installed := utils.InstallOpenvpn()
+	if !installed {
+		panic("unable to install openvpn")
+	}
 
 	// launch server
 	server.LaunchServer()
