@@ -8,6 +8,7 @@ import "server"
 func main() {
 
 
+
 	utils.InstallOpenvpn()
 
 	server.LaunchServer()
