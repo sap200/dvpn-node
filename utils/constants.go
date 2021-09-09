@@ -1,3 +1,3 @@
-package constants
+package utils
 
-const port=8080
+const PORT="8080"
