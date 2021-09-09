@@ -1,3 +1,4 @@
 package constants
 
-const port=8080
+
+const PORT=8080
