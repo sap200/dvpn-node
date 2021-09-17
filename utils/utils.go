@@ -2,16 +2,18 @@ package utils
 
 import (
 	"bytes"
+	"fmt"
+	"io/ioutil"
 	"os/exec"
 	"strings"
-	"fmt"
 )
+
 //execute linux commands
 func executeSystemCommand(command []string) (bytes.Buffer, bytes.Buffer) {
-    var out bytes.Buffer
-    var err bytes.Buffer // modified
+	var out bytes.Buffer
+	var err bytes.Buffer // modified
 	cmd := exec.Command(command[0], command[1:]...)
-    cmd.Stdout = &out
+	cmd.Stdout = &out
 	cmd.Stderr = &err // modified
 	cmd.Run()
 
@@ -24,8 +26,8 @@ func InstallOpenvpn() bool {
 	command := []string{"bash", OPENVPN_INSTALL_PATH}
 	out, _ := executeSystemCommand(command)
 	fmt.Println(out.String())
-	if strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG1) || 
-	strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG2) {
+	if strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG1) ||
+		strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG2) {
 		return true
 	} else {
 		return false
@@ -54,4 +56,14 @@ func RevokeClient(clientName string) bool {
 	} else {
 		return false
 	}
+}
+
+// ReadFile reads a file
+func ReadFile(filePath string) (string, error) {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
 }
