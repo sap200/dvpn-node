@@ -30,6 +30,9 @@ func LaunchServer() {
 }
 
 func handleConnection(conn net.Conn) {
+	// terminate the connection...
+	defer conn.Close()
+	
 	// TODO: handle handshake
-	// terminate the connection
+
 }
