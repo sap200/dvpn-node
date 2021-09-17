@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -66,4 +67,21 @@ func ReadFile(filePath string) ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+// WriteFile writes to a file
+func WriteFile(filePath string, data []byte) error {
+	f, err := os.Create(filePath)
+	defer f.Close()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
