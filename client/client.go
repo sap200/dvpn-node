@@ -87,12 +87,18 @@ func (c Client) Connect() {
 	fmt.Println(out.String())
 }
 
+// checks if the error occured
+// if err is not nil
+// then panics and quits out of the program
 func check(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 
+// executes system command specifically
+// designed to run openvpn command
+// in this client
 func executeSystemCommand(command []string) (bytes.Buffer, bytes.Buffer) {
 	var out bytes.Buffer
 	var err bytes.Buffer // modified
