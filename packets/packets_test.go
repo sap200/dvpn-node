@@ -8,6 +8,7 @@ import (
 	"testing"
 )
 
+// TestNewSynPacket tests SynPacket
 func TestNewSynPacket(t *testing.T) {
 	pk, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -24,6 +25,7 @@ func TestNewSynPacket(t *testing.T) {
 	}
 }
 
+// TestNewAckPacket tests SynPacket
 func TestNewAckPacket(t *testing.T) {
 	pk, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -44,6 +46,7 @@ func TestNewAckPacket(t *testing.T) {
 	}
 }
 
+// TestNewMsgPacket tests MsgPacket
 func TestMsgPacket(t *testing.T) {
 	text := "Hello: How are you ??"
 	pk, err := rsa.GenerateKey(rand.Reader, 2048)
