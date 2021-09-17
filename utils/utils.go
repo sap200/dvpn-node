@@ -59,11 +59,11 @@ func RevokeClient(clientName string) bool {
 }
 
 // ReadFile reads a file
-func ReadFile(filePath string) (string, error) {
+func ReadFile(filePath string) ([]byte, error) {
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
 
-	return string(data), nil
+	return data, nil
 }
