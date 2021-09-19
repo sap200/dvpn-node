@@ -19,8 +19,22 @@ import (
 	"github.com/sap200/dvpn-node/utils"
 )
 
+func initVars() {
+	pk, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+
+	MyPrivateKey = *pk
+	MyPublicKey = pk.PublicKey
+	AesKey = utils.GenerateRandomAESKey()
+	Storage = InitStore()
+}
+
 // LaunchServer launches the server
 func LaunchServer() {
+	// init the variables
+	initVars()
 	// log the server start
 	fmt.Printf("Node started at port %s\n", utils.PORT)
 
@@ -67,16 +81,8 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 
-	// read the client
-	data, err := utils.ReadFile(PATHPREFIX + synPacket.Message)
-	if err != nil {
-		fmt.Println(err)
-		fail(conn, "Handshake Failed")
-		return
-	}
-
 	// encrypt the message with public key
-	cipher, err := rsa.EncryptPKCS1v15(rand.Reader, &synPacket.PubKey, data)
+	cipher, err := rsa.EncryptPKCS1v15(rand.Reader, &synPacket.PubKey, AesKey)
 	if err != nil {
 		fmt.Println(err, "for", conn.RemoteAddr())
 		fail(conn, "Handshake Failed")
@@ -85,7 +91,7 @@ func handleConnection(conn net.Conn) {
 
 	// sign with own private key
 	hasher := sha512.New()
-	hasher.Write(data)
+	hasher.Write(AesKey)
 	hash := hasher.Sum(nil)
 	sign, err := rsa.SignPKCS1v15(rand.Reader, &MyPrivateKey, crypto.SHA512, hash)
 	if err != nil {
@@ -117,7 +123,55 @@ func handleConnection(conn net.Conn) {
 		fail(conn, "Handshake Failed")
 		return
 	}
-	// done acknowledgement.. rest of the things are handled by openvpn
+
+	// done acknowledgement..
+	// receive new acknowledgement from client representing aes key received
+	b, err = bufio.NewReader(conn).ReadString('\n')
+	if err != nil {
+		fmt.Println(err, "for", conn.RemoteAddr())
+		fail(conn, "Handshake Failed")
+		return
+	}
+	var ackPack packets.AckPacket
+	err = json.Unmarshal([]byte(b), &ackPack)
+	if err != nil {
+		fmt.Println(err, "for", conn.RemoteAddr())
+		fail(conn, "Handshake Failed")
+		return
+	}
+	if ackPack.AckStatus != packets.AckSuccess {
+		fmt.Println(err, "for", conn.RemoteAddr())
+		fail(conn, "Handshake Failed")
+		return
+	}
+
+	//fmt.Println(ackPack)
+
+	// got the aes key now...
+	// read the openvpn file and encrypt using aes key
+	data, err := utils.ReadFile(PATHPREFIX + synPacket.Message + EXTENSION)
+	if err != nil {
+		fmt.Println(err)
+		fail(conn, "Handshake Failed")
+		return
+	}
+
+	// now encrypt using AES data and send it back
+	encrypted := utils.EncryptAES(AesKey, data)
+
+	// transfer aes encrypted file
+	_, err = io.WriteString(conn, encrypted)
+	if err != nil {
+		fmt.Println(err, "for", conn.RemoteAddr())
+		fail(conn, "Handshake Failed")
+		return
+	}
+
+	//fmt.Println(encrypted)
+	// aes encrypted file transferred
+	// rest of the things are taken care by openvpn server
+	// .... finish of server
+
 }
 
 // When the handshake fails fail writes the acknowledgement fail packet to the connection.

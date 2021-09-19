@@ -18,7 +18,13 @@ var MyPublicKey rsa.PublicKey
 // PATHPREFIX is a constant denoting where the clients are stored
 const PATHPREFIX = "/root/"
 
+// EXTENSION is a constant for openvpn file which is .ovpn
+const EXTENSION = ".ovpn"
+
+// AesKey is used to encrypt and decrypt message
+var AesKey []byte
+
 // InitStore initializes the store keuy
-func InitStore() map[string]rsa.PublicKey {
-	return map[string]rsa.PublicKey{}
+func InitStore() map[string]packets.SynPacket {
+	return map[string]packets.SynPacket{}
 }

@@ -21,7 +21,7 @@ func executeSystemCommand(command []string) (bytes.Buffer, bytes.Buffer) {
 	return out, err
 }
 
-// install openvpn-server and configure it also run it as a service
+// InstallOpenvpn install openvpn-server and configure it also run it as a service
 // bash command "./scripts/openvpn-install.sh"
 func InstallOpenvpn() bool {
 	command := []string{"bash", OPENVPN_INSTALL_PATH}
@@ -35,7 +35,7 @@ func InstallOpenvpn() bool {
 	}
 }
 
-// add a client to the openvpn with the given client name
+// AddClient add a client to the openvpn with the given client name
 // bash command "bash ./scripts/add-client.sh clientName"
 func AddClient(clientName string) bool {
 	command := []string{"bash", OPENVPN_ADD_CLIENT_PATH, clientName}
@@ -47,7 +47,7 @@ func AddClient(clientName string) bool {
 	}
 }
 
-// remove a client from openvpn access list
+// RevokeClient remove a client from openvpn access list
 // bash command "bash "./scripts/remove-client.sh clientName"
 func RevokeClient(clientName string) bool {
 	command := []string{"bash", OPENVPN_REMOVE_CLIENT_PATH, clientName}
@@ -76,6 +76,10 @@ func WriteFile(filePath string, data []byte) error {
 
 	if err != nil {
 		return err
+	}
+
+	if err := os.Chmod(filePath, 0666); err != nil {
+		panic(err)
 	}
 
 	_, err = f.Write(data)

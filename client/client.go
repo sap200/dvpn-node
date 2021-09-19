@@ -3,15 +3,14 @@ package client
 
 import (
 	"bufio"
-	"bytes"
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha512"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net"
+	"os"
 	"os/exec"
 
 	"github.com/sap200/dvpn-node/packets"
@@ -60,6 +59,9 @@ func (c Client) Connect() {
 	err = json.Unmarshal([]byte(b), &ackPack)
 	check(err)
 
+	// set server public key
+	ServerPublicKey = ackPack.PubKey
+
 	var msgPacket packets.MsgPacket
 	// unmarshal message
 	err = json.Unmarshal([]byte(ackPack.Message), &msgPacket)
@@ -77,14 +79,35 @@ func (c Client) Connect() {
 	err = rsa.VerifyPKCS1v15(&ServerPublicKey, crypto.SHA512, hash, msgPacket.Signature)
 	check(err)
 
-	// once done it executes open-vpn command to connect to the respective server
-	err = utils.WriteFile("./openvpn-connection.ovpn", plainText)
+	// Assign Client AesKey for further encryption
+	AesKey = plainText
+	//fmt.Println(plainText)
+
+	// now then its successful send a new acknowledgement packet with status of 1
+	ackPacket := packets.NewAckPacket(packets.AckSuccess, rsa.PublicKey{}, "Received aes cipher successfully")
+	ackString, err := ackPacket.Marshall()
 	check(err)
 
+	// write the ackstring
+	_, err = io.WriteString(con, ackString)
+	check(err)
+
+	// now read the incoming message
+	ovf, err := bufio.NewReader(con).ReadString('\n')
+	check(err)
+
+	//fmt.Println(ovf)
+
+	decryptedOvf := utils.DecryptAES(AesKey, ovf)
+
+	// once done it executes open-vpn command to connect to the respective server
+	err = utils.WriteFile("./openvpn-connection.ovpn", decryptedOvf)
+	check(err)
+
+	//fmt.Println(string(decryptedOvf))
+
 	// connect to openvpn using the file
-	out, inErr := executeSystemCommand([]string{"openvpn", "./openvpn-connection.ovpn"})
-	fmt.Println(inErr.String())
-	fmt.Println(out.String())
+	executeSystemCommand([]string{"openvpn", "./openvpn-connection.ovpn"})
 }
 
 // checks if the error occured
@@ -99,13 +122,11 @@ func check(err error) {
 // executes system command specifically
 // designed to run openvpn command
 // in this client
-func executeSystemCommand(command []string) (bytes.Buffer, bytes.Buffer) {
-	var out bytes.Buffer
-	var err bytes.Buffer // modified
+func executeSystemCommand(command []string) {
+	// var out bytes.Buffer
+	// var err bytes.Buffer // modified
 	cmd := exec.Command(command[0], command[1:]...)
-	cmd.Stdout = &out
-	cmd.Stderr = &err // modified
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr // modified
 	cmd.Run()
-
-	return out, err
 }
