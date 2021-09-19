@@ -23,9 +23,12 @@ func main() {
 	// else print something went wrong...
 
 	// install and start openvpn as a service
+	// take command line args for node tpye
 	nodeType := flag.String("node", "server", "the node type: server or client")
 	flag.Parse()
-	if *nodeType == "server" {
+
+	switch *nodeType {
+	case "server":
 		installed := utils.InstallOpenvpn()
 		if !installed {
 			panic("unable to install openvpn")
@@ -34,10 +37,10 @@ func main() {
 		// launch server
 		server.LaunchServer()
 
-	} else if *nodeType == "client" {
+	case "client":
 		privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
 		c := client.NewClient(*privKey, "localhost:8080", "cosmos11abcxergtyds")
 		c.Connect()
-	}
 
+	}
 }

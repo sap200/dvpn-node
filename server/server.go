@@ -53,6 +53,7 @@ func LaunchServer() {
 
 func handleConnection(conn net.Conn) {
 	// terminate the connection...
+	fmt.Println("processing request from", conn.RemoteAddr().String())
 	defer conn.Close()
 
 	// receive synPacket
@@ -167,6 +168,7 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 
+	fmt.Println("Establishing secure tunnel with", conn.RemoteAddr().String())
 	//fmt.Println(encrypted)
 	// aes encrypted file transferred
 	// rest of the things are taken care by openvpn server
