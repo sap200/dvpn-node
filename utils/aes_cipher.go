@@ -7,10 +7,12 @@ import (
 	"encoding/hex"
 	"io"
 	"math/rand"
+	"time"
 )
 
 // GenerateRandomAESKey generates a random AES Key
 func GenerateRandomAESKey() []byte {
+	rand.Seed(time.Now().UnixNano())
 	bs := make([]byte, 32)
 
 	for i := 0; i < 32; i++ {
