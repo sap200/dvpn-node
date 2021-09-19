@@ -30,9 +30,8 @@ func InstallOpenvpn() bool {
 	if strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG1) ||
 		strings.Contains(out.String(), OPENVPN_INSTALL_SUCCESS_FLAG2) {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 // AddClient add a client to the openvpn with the given client name
@@ -42,9 +41,8 @@ func AddClient(clientName string) bool {
 	out, _ := executeSystemCommand(command)
 	if strings.Contains(out.String(), OPENVPN_ADD_CLIENT_SUCCESS_FLAG) {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 // RevokeClient remove a client from openvpn access list
@@ -54,9 +52,9 @@ func RevokeClient(clientName string) bool {
 	out, _ := executeSystemCommand(command)
 	if strings.Contains(out.String(), OPENVPN_REVOKE_CLIENT_SUCCESS_FLAG) {
 		return true
-	} else {
-		return false
 	}
+	return false
+
 }
 
 // ReadFile reads a file
