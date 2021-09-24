@@ -12,6 +12,7 @@ import (
 // PrintServer does ascii art for the string server
 func PrintServer() {
 	myFigure := figure.NewFigure("Zovino Server", "", true)
+	fmt.Println("🐲")
 	myFigure.Print()
 	fmt.Println()
 }
@@ -19,6 +20,7 @@ func PrintServer() {
 // PrintClient does ascii art for string client
 func PrintClient() {
 	myFigure := figure.NewFigure("Zovino Client", "", true)
+	fmt.Println("\n💻")
 	myFigure.Print()
 	fmt.Println()
 }
