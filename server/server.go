@@ -84,41 +84,6 @@ func handleConnection(conn net.Conn) {
 		return
 	}
 
-	if synPacket.Message == utils.TERMINATE {
-		fmt.Println("Received termination command from ", conn.RemoteAddr().String())
-		// delete the client from the storage
-		pack, ok := Storage[GetIP(conn.RemoteAddr().String())]
-		stat := packets.AckFail
-		if ok {
-			// Revoke client access
-			utils.RevokeClient(pack.Message)
-			// delete it from the storage
-			delete(Storage, GetIP(conn.RemoteAddr().String()))
-			// set the ack status to success
-			stat = packets.AckSuccess
-		}
-		// make an ack packet and send back to the client
-		ackPacket := packets.NewAckPacket(int64(stat), rsa.PublicKey{}, "terminated connection")
-		ackMsg, err := ackPacket.Marshall()
-		if err != nil {
-			fail(conn, err.Error())
-		}
-
-		fmt.Println(ackPacket)
-		_, err = io.WriteString(conn, ackMsg)
-		if err != nil {
-			fmt.Println("Unable to write to connection")
-		}
-
-		if stat == packets.AckSuccess {
-			fmt.Println("Connection termination was successful..")
-		} else {
-			fmt.Println("Unsuccessful connection termination")
-		}
-
-		return
-	}
-
 	// store in corresponding ip its public key
 	Storage[GetIP(conn.RemoteAddr().String())] = synPacket
 	// create a client

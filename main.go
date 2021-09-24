@@ -35,11 +35,13 @@ func main() {
 		}
 
 		// launch server
+		utils.PrintServer()
 		server.LaunchServer()
 
 	case "client":
+		utils.PrintClient()
 		privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-		c := client.NewClient(*privKey, "localhost:8080", "cosmos11abcxergtyds")
+		c := client.NewClient(*privKey, "localhost:8080", "cosmos11abcxergtydsllb")
 		c.Connect()
 
 	}
