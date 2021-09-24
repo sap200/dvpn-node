@@ -8,10 +8,13 @@ import (
 	"crypto/rsa"
 	"crypto/sha512"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net"
 	"os"
 	"os/exec"
+	"os/signal"
+	"syscall"
 
 	"github.com/sap200/dvpn-node/packets"
 	"github.com/sap200/dvpn-node/utils"
@@ -129,4 +132,22 @@ func executeSystemCommand(command []string) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr // modified
 	cmd.Run()
+
+	// on pressing of ctrl + c
+	// do the following
+
+	sigs := make(chan os.Signal, 1)
+	done := make(chan bool, 1)
+
+	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		sig := <-sigs
+		fmt.Println(sig)
+		done <- true
+	}()
+
+	<-done
+	fmt.Println(done, "pressed ctrl + c, quitting...")
+	os.Exit(0)
 }

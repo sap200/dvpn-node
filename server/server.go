@@ -6,6 +6,7 @@ package server
 
 import (
 	"bufio"
+	"bytes"
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
@@ -14,6 +15,10 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"os"
+	"os/exec"
+	"os/signal"
+	"syscall"
 
 	"github.com/sap200/dvpn-node/packets"
 	"github.com/sap200/dvpn-node/utils"
@@ -37,6 +42,33 @@ func LaunchServer() {
 	initVars()
 	// log the server start
 	fmt.Printf("Node started at port %s\n", utils.PORT)
+
+	sigs := make(chan os.Signal)
+	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		sig := <-sigs
+		fmt.Println(sig, "Inside cleanup routine")
+		// ----------------------------------------------------------------
+		//TODO: deregister the server on cosmos blockchain, that it went down...
+
+		// -----------------------------------------------------------------
+		// cleanup all the existing users in the storage
+		for _, pack := range Storage {
+			fmt.Print("Revoking ", pack.Message)
+			res := utils.RevokeClient(pack.Message)
+			if res {
+				fmt.Print(" ,Revoke Success")
+			} else {
+				fmt.Print(" ,Revoke Fail")
+			}
+			fmt.Println()
+		}
+
+		// stop the openvpn server
+		// exit
+		os.Exit(0)
+	}()
 
 	ln, err := net.Listen("tcp", ":"+utils.PORT)
 	if err != nil {
@@ -187,4 +219,20 @@ func fail(conn net.Conn, message string) {
 	io.WriteString(conn, bs)
 	conn.Close()
 	fmt.Println("Handshake Failed closed connection")
+}
+
+// Execute system command
+func executeSystemCommand(command []string) bool {
+	var out bytes.Buffer
+	var err bytes.Buffer // modified
+	cmd := exec.Command(command[0], command[1:]...)
+	cmd.Stdout = &out
+	cmd.Stderr = &err // modified
+	cmd.Run()
+
+	if err.String() == "" {
+		return false
+	}
+
+	return true
 }
