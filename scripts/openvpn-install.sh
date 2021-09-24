@@ -439,5 +439,5 @@ else
 	clear
 	echo "OpenVPN is already installed."
 	# Restart openvpn
-	sudo systemctl restart openvpn
+	systemctl restart openvpn
 fi

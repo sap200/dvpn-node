@@ -41,7 +41,7 @@ func main() {
 	case "client":
 		utils.PrintClient()
 		privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-		c := client.NewClient(*privKey, "localhost:8080", "cosmos11abcxergtydsllb")
+		c := client.NewClient(*privKey, "178.79.134.14:8080", "cosmos11abcxergtydsllb")
 		c.Connect()
 
 	}
