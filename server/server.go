@@ -43,34 +43,12 @@ func LaunchServer() {
 	// log the server start
 	fmt.Printf("Node started at port %s\n", utils.PORT)
 
+	// on press of ctrl + c, do the basic cleanup before exiting the server
 	sigs := make(chan os.Signal)
 	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
+	go cleanup(sigs)
 
-	go func() {
-		sig := <-sigs
-		fmt.Println(sig, "Inside cleanup routine")
-		// ----------------------------------------------------------------
-		//TODO: deregister the server on cosmos blockchain, that it went down...
-
-		// -----------------------------------------------------------------
-		// cleanup all the existing users in the storage
-		for _, pack := range Storage {
-			fmt.Print("Revoking ", pack.Message)
-			res := utils.RevokeClient(pack.Message)
-			if res {
-				fmt.Print(" ,Revoke Success")
-			} else {
-				fmt.Print(" ,Revoke Fail")
-			}
-			fmt.Println()
-		}
-
-		// stop the openvpn server
-		utils.StopOpenvpn()
-		// exit
-		os.Exit(0)
-	}()
-
+	// start the listener
 	ln, err := net.Listen("tcp", ":"+utils.PORT)
 	if err != nil {
 		panic(err)
@@ -236,4 +214,31 @@ func executeSystemCommand(command []string) bool {
 	}
 
 	return true
+}
+
+// cleanup function cleans up everything before exiting the server
+func cleanup(sigs chan os.Signal) {
+	sig := <-sigs
+	fmt.Println(sig, "Inside cleanup routine")
+	// ----------------------------------------------------------------
+	//TODO: deregister the server on cosmos blockchain, that it went down...
+	// This is to be done, after the blockchain is ready
+
+	// -----------------------------------------------------------------
+	// cleanup all the existing users in the storage
+	for _, pack := range Storage {
+		fmt.Print("Revoking ", pack.Message)
+		res := utils.RevokeClient(pack.Message)
+		if res {
+			fmt.Print(" ,Revoke Success")
+		} else {
+			fmt.Print(" ,Revoke Fail")
+		}
+		fmt.Println()
+	}
+
+	// stop the openvpn server
+	utils.StopOpenvpn()
+	// exit
+	os.Exit(0)
 }
