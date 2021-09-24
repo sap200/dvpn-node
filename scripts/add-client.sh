@@ -28,13 +28,20 @@ fi
 
 unsanitized_client="$1"
 client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
-if [[ -z "$client" || -e /etc/openvpn/server/easy-rsa/pki/issued/"$client".crt ]]
+if [[ -z "$client" ]]
 then
     echo "$client: invalid name." >&2
     exit 2
     # read -p "Name: " unsanitized_client
     # client=$(sed 's/[^0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-]/_/g' <<< "$unsanitized_client")
 fi
+
+if [[ -e /etc/openvpn/server/easy-rsa/pki/issued/"$client".crt ]]
+then
+	echo "$client: already exists."
+	exit 0
+fi
+
 cd /etc/openvpn/server/easy-rsa/
 EASYRSA_CERT_EXPIRE=3650 ./easyrsa build-client-full "$client" nopass
 # Generates the custom client.ovpn

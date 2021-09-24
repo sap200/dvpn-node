@@ -14,7 +14,6 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"syscall"
 
 	"github.com/sap200/dvpn-node/packets"
 	"github.com/sap200/dvpn-node/utils"
@@ -128,7 +127,7 @@ func check(err error) {
 func (c Client) executeSystemCommand(command []string) {
 	sigs := make(chan os.Signal)
 
-	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(sigs, os.Interrupt)
 
 	go func() {
 		sig := <-sigs
