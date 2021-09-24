@@ -110,7 +110,7 @@ func (c Client) Connect() {
 	//fmt.Println(string(decryptedOvf))
 
 	// connect to openvpn using the file
-	executeSystemCommand([]string{"openvpn", "./openvpn-connection.ovpn"})
+	c.executeSystemCommand([]string{"openvpn", "./openvpn-connection.ovpn"})
 }
 
 // checks if the error occured
@@ -125,14 +125,51 @@ func check(err error) {
 // executes system command specifically
 // designed to run openvpn command
 // in this client
-func executeSystemCommand(command []string) {
+func (c Client) executeSystemCommand(command []string) {
 	sigs := make(chan os.Signal)
 
 	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
 		sig := <-sigs
+		fmt.Println()
+		fmt.Println()
 		fmt.Println(sig, "Inside the cleanup function")
+		// connect to the server and send a SynPacket for termination
+		synPacket := packets.NewSynPacket(rsa.PublicKey{}, utils.TERMINATE)
+		//fmt.Println(synPacket)
+		synPackString, err := synPacket.Marshall()
+		check(err)
+		//fmt.Println(synPackString)
+
+		// send synPacket to the terminate connection
+		con, err := net.Dial("tcp", c.ServerAddress)
+		//fmt.Println("connection-done.....")
+		check(err)
+		//fmt.Println("After connection")
+
+		//fmt.Println("connection-done.....")
+
+		_, err = io.WriteString(con, synPackString)
+		check(err)
+		//fmt.Println("Wrote successfully...")
+
+		// wait for server to reply with acksuccess or ack fail
+		b, err := bufio.NewReader(con).ReadString('\n')
+		check(err)
+
+		// decode the message
+		var ackPack packets.AckPacket
+		err = json.Unmarshal([]byte(b), &ackPack)
+		//fmt.Println(ackPack)
+		check(err)
+
+		if ackPack.AckStatus == packets.AckSuccess {
+			fmt.Println("Connection-terminated successfully")
+		} else {
+			fmt.Println("Problem in connection termination from server side")
+		}
+
 		os.Exit(0)
 	}()
 	// var out bytes.Buffer

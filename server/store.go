@@ -2,6 +2,7 @@ package server
 
 import (
 	"crypto/rsa"
+	"strings"
 
 	"github.com/sap200/dvpn-node/packets"
 )
@@ -27,4 +28,9 @@ var AesKey []byte
 // InitStore initializes the store keuy
 func InitStore() map[string]packets.SynPacket {
 	return map[string]packets.SynPacket{}
+}
+
+// GetIP gets the Ip of the addresss string
+func GetIP(addr string) string {
+	return strings.Split(addr, ":")[0]
 }
