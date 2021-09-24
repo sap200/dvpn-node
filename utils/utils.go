@@ -39,7 +39,7 @@ func InstallOpenvpn() bool {
 func AddClient(clientName string) bool {
 	command := []string{"bash", OPENVPN_ADD_CLIENT_PATH, clientName}
 	out, _ := executeSystemCommand(command)
-	fmt.Println("out: ", out.String())
+	// fmt.Println("out: ", out.String())
 	if strings.Contains(out.String(), OPENVPN_ADD_CLIENT_SUCCESS_FLAG) ||
 		strings.Contains(out.String(), ALREADY_SUCC_FLAG_OPENVPN) {
 		return true
