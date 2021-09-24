@@ -126,28 +126,19 @@ func check(err error) {
 // designed to run openvpn command
 // in this client
 func executeSystemCommand(command []string) {
+	sigs := make(chan os.Signal)
+
+	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		sig := <-sigs
+		fmt.Println(sig, "Inside the cleanup function")
+		os.Exit(0)
+	}()
 	// var out bytes.Buffer
 	// var err bytes.Buffer // modified
 	cmd := exec.Command(command[0], command[1:]...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr // modified
 	cmd.Run()
-
-	// on pressing of ctrl + c
-	// do the following
-
-	sigs := make(chan os.Signal, 1)
-	done := make(chan bool, 1)
-
-	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
-
-	go func() {
-		sig := <-sigs
-		fmt.Println(sig)
-		done <- true
-	}()
-
-	<-done
-	fmt.Println(done, "pressed ctrl + c, quitting...")
-	os.Exit(0)
 }
