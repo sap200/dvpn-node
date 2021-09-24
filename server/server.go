@@ -66,6 +66,7 @@ func LaunchServer() {
 		}
 
 		// stop the openvpn server
+		utils.StopOpenvpn()
 		// exit
 		os.Exit(0)
 	}()

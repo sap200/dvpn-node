@@ -438,5 +438,6 @@ verb 3" > /etc/openvpn/server/client-common.txt
 else
 	clear
 	echo "OpenVPN is already installed."
+	sudo systemctl restart openvpn
 	echo
 fi
