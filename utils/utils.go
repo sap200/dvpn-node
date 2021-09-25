@@ -92,7 +92,7 @@ func WriteFile(filePath string, data []byte) error {
 
 // StopOpenvpn stops the openvpn service by executing a system command
 func StopOpenvpn() {
-	cmd := exec.Command("systemctl", "stop", "openvpn")
+	cmd := exec.Command("systemctl", "stop", "openvpn-server@server.service")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()

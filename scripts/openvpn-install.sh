@@ -439,6 +439,5 @@ else
 	clear
 	echo "OpenVPN is already installed."
 	# Restart openvpn
-	systemctl enable --now openvpn-server@server.service
-	service openvpn restart
+	systemctl restart openvpn-server@server.service
 fi
