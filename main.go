@@ -16,8 +16,6 @@ import (
 	"github.com/tendermint/starport/starport/pkg/cosmosclient"
 )
 
-// Aashin's part
-
 func main() {
 
 	// TODO: take the command line argument
@@ -30,16 +28,16 @@ func main() {
 	// install and start openvpn as a service
 	// take command line args for node tpye
 	//nodeType := flag.String("node", "server", "the node type: server or client")
-	serverCmd := flag.NewFlagSet("server", flag.ExitOnError)
-	seed := serverCmd.String("seed", "http://localhost:26657", "node of a blockchain to connect to")
+	serverCmd := flag.NewFlagSet("server", flag.ContinueOnError)
+	seed := serverCmd.String("seed", utils.DEFAULT_BLOCKCHAIN_LINK, "node of a blockchain to connect to")
 	accountName := serverCmd.String("account", "", "the account under which server should be registered")
 
 	//query commands
-	queryCmd := flag.NewFlagSet("list-nodes", flag.ExitOnError)
-	qNode := queryCmd.String("seed", "http://localhost:26657", "query node address")
+	queryCmd := flag.NewFlagSet("list-nodes", flag.ContinueOnError)
+	qNode := queryCmd.String("seed", utils.DEFAULT_BLOCKCHAIN_LINK, "query node address")
 
 	// connect commands
-	connectCmd := flag.NewFlagSet("connect", flag.ExitOnError)
+	connectCmd := flag.NewFlagSet("connect", flag.ContinueOnError)
 	nodeID := connectCmd.String("ip", "", "ip address of the vpn node")
 	accountAddress := connectCmd.String("account", "", "cosmos account name")
 
@@ -61,10 +59,10 @@ func main() {
 			os.Exit(1)
 		}
 
-		// installed := utils.InstallOpenvpn()
-		// if !installed {
-		// 	panic("unable to install openvpn")
-		// }
+		installed := utils.InstallOpenvpn()
+		if !installed {
+			panic("unable to install openvpn")
+		}
 
 		// launch server
 		// make a cosmos client
@@ -104,7 +102,7 @@ func main() {
 
 		utils.PrintClient()
 		privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-		c := client.NewClient(*privKey, *nodeID+":8080", *accountAddress)
+		c := client.NewClient(*privKey, *nodeID+":"+utils.PORT, *accountAddress)
 		c.Connect()
 
 	default:
