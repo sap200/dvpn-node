@@ -22,6 +22,7 @@ import (
 
 	"github.com/sap200/dvpn-node/packets"
 	"github.com/sap200/dvpn-node/utils"
+	"github.com/sap200/vineyard/x/vineyard/types"
 	"github.com/tendermint/starport/starport/pkg/cosmosclient"
 )
 
@@ -53,7 +54,7 @@ func LaunchServer(cc cosmosclient.Client, accountName string) {
 	// on press of ctrl + c, do the basic cleanup before exiting the server
 	sigs := make(chan os.Signal)
 	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
-	go cleanup(sigs)
+	go cleanup(sigs, cc, accountName)
 
 	// start the listener
 	ln, err := net.Listen("tcp", ":"+utils.PORT)
@@ -225,7 +226,7 @@ func executeSystemCommand(command []string) bool {
 }
 
 // cleanup function cleans up everything before exiting the server
-func cleanup(sigs chan os.Signal) {
+func cleanup(sigs chan os.Signal, cc cosmosclient.Client, accName string) {
 	sig := <-sigs
 	fmt.Println(sig, "Inside cleanup routine")
 	// ----------------------------------------------------------------
@@ -243,6 +244,22 @@ func cleanup(sigs chan os.Signal) {
 			fmt.Print(" ,Revoke Fail")
 		}
 		fmt.Println()
+	}
+
+	accAddress, err := cc.Address(accName)
+	if err != nil {
+		fmt.Println("cannot deregister node")
+	} else {
+		// delete the node entry in blockchain
+		msg := types.NewMsgDeleteNode(accAddress.String(), UUIDOfServer)
+
+		// broadcast the message
+		txResp, err := cc.BroadcastTx(accName, msg)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(txResp)
+		}
 	}
 
 	// stop the openvpn server
