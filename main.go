@@ -39,7 +39,7 @@ func main() {
 	// connect commands
 	connectCmd := flag.NewFlagSet("connect", flag.ContinueOnError)
 	nodeID := connectCmd.String("ip", "", "ip address of the vpn node")
-	accountAddress := connectCmd.String("account", "", "cosmos account name")
+	accountName1 := connectCmd.String("account", "", "cosmos account name")
 
 	flag.Parse()
 
@@ -95,14 +95,24 @@ func main() {
 			os.Exit(1)
 		}
 
-		if *accountAddress == "" {
+		if *accountName1 == "" {
 			connectCmd.PrintDefaults()
 			os.Exit(1)
 		}
 
+		cc, err := cosmosclient.New(context.Background(), cosmosclient.WithNodeAddress(*seed))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		add, err := cc.Address(*accountName1)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
 		utils.PrintClient()
 		privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-		c := client.NewClient(*privKey, *nodeID+":"+utils.PORT, *accountAddress)
+		c := client.NewClient(*privKey, *nodeID+":"+utils.PORT, add.String())
 		c.Connect()
 
 	default:
