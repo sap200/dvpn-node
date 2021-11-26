@@ -22,6 +22,7 @@ import (
 
 	"github.com/sap200/dvpn-node/packets"
 	"github.com/sap200/dvpn-node/utils"
+	"github.com/tendermint/starport/starport/pkg/cosmosclient"
 )
 
 func initVars() {
@@ -37,7 +38,13 @@ func initVars() {
 }
 
 // LaunchServer launches the server
-func LaunchServer() {
+func LaunchServer(cc cosmosclient.Client, accountName string) {
+	// intialize the map
+	initMap()
+
+	// register the server
+	registerNode(cc, accountName)
+
 	// init the variables
 	initVars()
 	// log the server start

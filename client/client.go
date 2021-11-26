@@ -3,18 +3,22 @@ package client
 
 import (
 	"bufio"
+	"context"
 	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha512"
 	"encoding/json"
 	"io"
+	"log"
 	"net"
 	"os"
 	"os/exec"
 
 	"github.com/sap200/dvpn-node/packets"
 	"github.com/sap200/dvpn-node/utils"
+	"github.com/sap200/vineyard/x/vineyard/types"
+	"github.com/tendermint/starport/starport/pkg/cosmosclient"
 )
 
 // Client contains general information about Client
@@ -129,4 +133,17 @@ func (c Client) executeSystemCommand(command []string) {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr // modified
 	cmd.Run()
+}
+
+// QueryAll returns the list of servers
+func QueryAll(seed string) ([]types.Node, error) {
+
+	cc, err := cosmosclient.New(context.Background(), cosmosclient.WithNodeAddress(seed))
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	qc := types.NewQueryClient(cc.Context)
+	qResp, err := qc.NodeAll(context.Background(), &types.QueryAllNodeRequest{})
+	return qResp.Node, err
 }
