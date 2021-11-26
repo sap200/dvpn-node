@@ -46,11 +46,7 @@ func main() {
 	flag.Parse()
 
 	if len(os.Args) < 2 {
-		fmt.Println("usage:")
-		fmt.Println("--------------------------------------------------------------------------")
-		fmt.Println("server\n\t-for launching a server")
-		fmt.Println("list-nodes\n\t-for listing available nodes")
-		fmt.Println("connect\n\t-for connecting to available nodes")
+		printUsage()
 		os.Exit(1)
 	}
 
@@ -58,10 +54,10 @@ func main() {
 	case "server":
 		serverCmd.Parse(os.Args[2:])
 
-		fmt.Println("Here", *seed, "AccountName", *accountName)
+		//fmt.Println("Here", *seed, "AccountName", *accountName)
 
 		if *accountName == "" {
-			flag.PrintDefaults()
+			serverCmd.PrintDefaults()
 			os.Exit(1)
 		}
 
@@ -97,12 +93,12 @@ func main() {
 	case "connect":
 		connectCmd.Parse(os.Args[2:])
 		if *nodeID == "" {
-			flag.PrintDefaults()
+			connectCmd.PrintDefaults()
 			os.Exit(1)
 		}
 
 		if *accountAddress == "" {
-			flag.PrintDefaults()
+			connectCmd.PrintDefaults()
 			os.Exit(1)
 		}
 
@@ -111,5 +107,18 @@ func main() {
 		c := client.NewClient(*privKey, *nodeID+":8080", *accountAddress)
 		c.Connect()
 
+	default:
+		log.Println("Invalid command")
+		printUsage()
+		os.Exit(1)
+
 	}
+}
+
+func printUsage() {
+	fmt.Println("usage:")
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("server\n\t-for launching a server")
+	fmt.Println("list-nodes\n\t-for listing available nodes")
+	fmt.Println("connect\n\t-for connecting to available nodes")
 }

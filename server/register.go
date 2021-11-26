@@ -69,8 +69,8 @@ func registerNode(cc cosmosclient.Client, accountName string) {
 		id.String(),
 		detail.IP,
 		detail.Region+", "+Iso2ToCountry[detail.Country],
-		"", //  bandwidth
-		"", // uid
+		"", //future bandwidth
+		"", // future uid or empty field
 	)
 
 	// Broadcast the Txs
