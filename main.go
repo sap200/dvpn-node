@@ -43,8 +43,15 @@ func main() {
 	nodeID := connectCmd.String("ip", "", "ip address of the vpn node")
 	accountAddress := connectCmd.String("account", "", "cosmos account name")
 
+	flag.Parse()
+
 	if len(os.Args) < 2 {
-		panic("please provide argument to be server or client")
+		fmt.Println("usage:")
+		fmt.Println("--------------------------------------------------------------------------")
+		fmt.Println("server\n\t-for launching a server")
+		fmt.Println("list-nodes\n\t-for listing available nodes")
+		fmt.Println("connect\n\t-for connecting to available nodes")
+		os.Exit(1)
 	}
 
 	switch os.Args[1] {
@@ -54,6 +61,7 @@ func main() {
 		fmt.Println("Here", *seed, "AccountName", *accountName)
 
 		if *accountName == "" {
+			flag.PrintDefaults()
 			os.Exit(1)
 		}
 
@@ -89,10 +97,12 @@ func main() {
 	case "connect":
 		connectCmd.Parse(os.Args[2:])
 		if *nodeID == "" {
+			flag.PrintDefaults()
 			os.Exit(1)
 		}
 
 		if *accountAddress == "" {
+			flag.PrintDefaults()
 			os.Exit(1)
 		}
 
