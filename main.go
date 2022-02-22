@@ -100,7 +100,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		cc, err := cosmosclient.New(context.Background(), cosmosclient.WithNodeAddress(*seed))
+		cc, err := cosmosclient.New(context.Background(), cosmosclient.WithNodeAddress(*seed), cosmosclient.WithHome("/home/saptarsi/.vineyard"))
 		if err != nil {
 			log.Fatalln(err)
 		}
