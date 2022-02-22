@@ -66,7 +66,8 @@ func TestParseSessionConfig(t *testing.T) {
 	"Account": "alice",
 	"Remote": "192.13.14.21",
 	"KeyHome": "/home/sapta/vineyard",
-	"Port": "5989"
+	"Port": "5989",
+	"IPAddr": "10.0.2.18"
 }`
 
 	f.Write([]byte(d))
@@ -96,6 +97,10 @@ func TestParseSessionConfig(t *testing.T) {
 
 	if pc.Port != "5989" {
 		t.Fatalf("Port mismatch: Expected %s, got %s\n", "5989", pc.Port)
+	}
+
+	if pc.IPAddr != "10.0.2.18" {
+		t.Fatalf("IPAddr mismatch: Expected %s, got %s\n", "10.0.2.18", pc.IPAddr)
 	}
 
 }

@@ -22,6 +22,7 @@ type SessionConfig struct {
 	Remote  string `json:"Remote"`
 	KeyHome string `json:"KeyHome"`
 	Port    string `json:"Port"`
+	IPAddr  string `json:"IPAddr"`
 }
 
 // ParseServerConfig parses json file
