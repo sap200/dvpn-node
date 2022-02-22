@@ -39,7 +39,7 @@ func initVars() {
 }
 
 // LaunchServer launches the server
-func LaunchServer(cc cosmosclient.Client, accountName string) {
+func LaunchServer(cc cosmosclient.Client, accountName string, port string) {
 	// intialize the map
 	initMap()
 
@@ -49,7 +49,7 @@ func LaunchServer(cc cosmosclient.Client, accountName string) {
 	// init the variables
 	initVars()
 	// log the server start
-	fmt.Printf("Node started at port %s\n", utils.PORT)
+	fmt.Printf("Node started at port %s\n", port)
 
 	// on press of ctrl + c, do the basic cleanup before exiting the server
 	sigs := make(chan os.Signal)
@@ -57,7 +57,7 @@ func LaunchServer(cc cosmosclient.Client, accountName string) {
 	go cleanup(sigs, cc, accountName)
 
 	// start the listener
-	ln, err := net.Listen("tcp", ":"+utils.PORT)
+	ln, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		panic(err)
 	}

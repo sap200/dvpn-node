@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/sap200/dvpn-node/client"
+	"github.com/sap200/dvpn-node/parser"
 	"github.com/sap200/dvpn-node/server"
 	"github.com/sap200/dvpn-node/utils"
 	"github.com/tendermint/starport/starport/pkg/cosmosclient"
@@ -28,9 +29,11 @@ func main() {
 	// install and start openvpn as a service
 	// take command line args for node tpye
 	//nodeType := flag.String("node", "server", "the node type: server or client")
+	//------------------- server command-------------------
 	serverCmd := flag.NewFlagSet("server", flag.ContinueOnError)
-	seed := serverCmd.String("seed", utils.DEFAULT_BLOCKCHAIN_LINK, "node of a blockchain to connect to")
-	accountName := serverCmd.String("account", "", "the account under which server should be registered")
+	cfileName := serverCmd.String("config", "", "Configuration File")
+	//seed := serverCmd.String("seed", utils.DEFAULT_BLOCKCHAIN_LINK, "node of a blockchain to connect to")
+	//accountName := serverCmd.String("account", "", "the account under which server should be registered")
 
 	//query commands
 	queryCmd := flag.NewFlagSet("list-nodes", flag.ContinueOnError)
@@ -38,8 +41,9 @@ func main() {
 
 	// connect commands
 	connectCmd := flag.NewFlagSet("connect", flag.ContinueOnError)
-	nodeID := connectCmd.String("ip", "", "ip address of the vpn node")
-	accountName1 := connectCmd.String("account", "", "cosmos account name")
+	confile := connectCmd.String("config", "", "Configuration file")
+	//nodeID := connectCmd.String("ip", "", "ip address of the vpn node")
+	//accountName1 := connectCmd.String("account", "", "cosmos account name")
 
 	flag.Parse()
 
@@ -54,25 +58,36 @@ func main() {
 
 		//fmt.Println("Here", *seed, "AccountName", *accountName)
 
-		if *accountName == "" {
+		if *cfileName == "" {
 			serverCmd.PrintDefaults()
 			os.Exit(1)
 		}
 
+		// check installation
 		installed := utils.InstallOpenvpn()
 		if !installed {
 			panic("unable to install openvpn")
 		}
 
+		// Parse the config file
+		cfg, err := parser.ParseServerConfig(*cfileName)
+		if err != nil {
+			panic(err)
+		}
+
 		// launch server
 		// make a cosmos client
-		cc, err := cosmosclient.New(context.Background(), cosmosclient.WithNodeAddress(*seed))
+		cc, err := cosmosclient.New(context.Background(),
+			cosmosclient.WithNodeAddress(cfg.Remote),
+			cosmosclient.WithHome(cfg.KeyHome),
+		)
+
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 		utils.PrintServer()
-		server.LaunchServer(cc, *accountName)
+		server.LaunchServer(cc, cfg.Account, cfg.Port)
 
 	case "list-nodes":
 		queryCmd.Parse(os.Args[2:])
@@ -90,29 +105,33 @@ func main() {
 
 	case "connect":
 		connectCmd.Parse(os.Args[2:])
-		if *nodeID == "" {
+		if *confile == "" {
 			connectCmd.PrintDefaults()
 			os.Exit(1)
 		}
 
-		if *accountName1 == "" {
-			connectCmd.PrintDefaults()
-			os.Exit(1)
+		cfg, err := parser.ParseSessionConfig(*confile)
+		if err != nil {
+			panic(err)
 		}
 
-		cc, err := cosmosclient.New(context.Background(), cosmosclient.WithNodeAddress(*seed), cosmosclient.WithHome("/home/saptarsi/.vineyard"))
+		cc, err := cosmosclient.New(context.Background(),
+			cosmosclient.WithNodeAddress(cfg.Remote),
+			cosmosclient.WithHome(cfg.KeyHome),
+		)
+
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		add, err := cc.Address(*accountName1)
+		add, err := cc.Address(cfg.Account)
 		if err != nil {
 			log.Fatalln(err)
 		}
 
 		utils.PrintClient()
 		privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-		c := client.NewClient(*privKey, *nodeID+":"+utils.PORT, add.String())
+		c := client.NewClient(*privKey, cfg.Remote+":"+cfg.Port, add.String())
 		c.Connect()
 
 	default:

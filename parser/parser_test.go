@@ -14,6 +14,7 @@ func TestParseServerConfig(t *testing.T) {
 	}
 
 	d := `{
+	"Type": "server",
 	"Account": "alice",
 	"Remote": "http://localhost:26657",
 	"KeyHome": "/home/sapta/vineyard",
@@ -30,6 +31,10 @@ func TestParseServerConfig(t *testing.T) {
 	os.Remove(name)
 
 	//fmt.Println(pc)
+
+	if pc.Type != "server" {
+		t.Fatalf("Type mismatch: Expected %s, got %s\n", "server", pc.Account)
+	}
 
 	if pc.Account != "alice" {
 		t.Fatalf("Account mismatch: Expected %s, got %s\n", "alice", pc.Account)
@@ -57,6 +62,7 @@ func TestParseSessionConfig(t *testing.T) {
 	}
 
 	d := `{
+	"Type": "session",
 	"Account": "alice",
 	"Remote": "192.13.14.21",
 	"KeyHome": "/home/sapta/vineyard",
@@ -71,6 +77,10 @@ func TestParseSessionConfig(t *testing.T) {
 	}
 
 	os.Remove(name)
+
+	if pc.Type != "session" {
+		t.Fatalf("Type mismatch: Expected %s, got %s\n", "session", pc.Account)
+	}
 
 	if pc.Account != "alice" {
 		t.Fatalf("Account mismatch: Expected %s, got %s\n", "alice", pc.Account)

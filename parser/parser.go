@@ -8,6 +8,7 @@ import (
 
 // ServerConfig is a struct that contains configuration of server
 type ServerConfig struct {
+	Type    string `json:"Type"`
 	Account string `json:"Account"`
 	Remote  string `json:"Remote"`
 	KeyHome string `json:"KeyHome"`
@@ -16,6 +17,7 @@ type ServerConfig struct {
 
 // SessionConfig is a struct that contains configuration of a connection session
 type SessionConfig struct {
+	Type    string `json:"Type"`
 	Account string `json:"Account"`
 	Remote  string `json:"Remote"`
 	KeyHome string `json:"KeyHome"`
