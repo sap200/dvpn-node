@@ -18,7 +18,8 @@ func TestParseServerConfig(t *testing.T) {
 	"Account": "alice",
 	"Remote": "http://localhost:26657",
 	"KeyHome": "/home/sapta/vineyard",
-	"Port": "5899"
+	"Port": "5899",
+	"App": "8000"
 }`
 
 	f.Write([]byte(d))
@@ -31,6 +32,11 @@ func TestParseServerConfig(t *testing.T) {
 	os.Remove(name)
 
 	//fmt.Println(pc)
+
+	if pc.App != "8000" {
+		t.Fatalf("App-port mismatch: Expected %s, got %s\n", "8000", pc.App)
+
+	}
 
 	if pc.Type != "server" {
 		t.Fatalf("Type mismatch: Expected %s, got %s\n", "server", pc.Account)
@@ -67,7 +73,8 @@ func TestParseSessionConfig(t *testing.T) {
 	"Remote": "192.13.14.21",
 	"KeyHome": "/home/sapta/vineyard",
 	"Port": "5989",
-	"IPAddr": "10.0.2.18"
+	"IPAddr": "10.0.2.18",
+	"App": "8000"
 }`
 
 	f.Write([]byte(d))
@@ -78,6 +85,10 @@ func TestParseSessionConfig(t *testing.T) {
 	}
 
 	os.Remove(name)
+
+	if pc.App != "8000" {
+		t.Fatalf("App-port mismatch: Expected %s, got %s\n", "8000", pc.App)
+	}
 
 	if pc.Type != "session" {
 		t.Fatalf("Type mismatch: Expected %s, got %s\n", "session", pc.Account)

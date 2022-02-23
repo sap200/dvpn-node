@@ -13,6 +13,7 @@ type ServerConfig struct {
 	Remote  string `json:"Remote"`
 	KeyHome string `json:"KeyHome"`
 	Port    string `json:"Port"`
+	App     string `json:"App"`
 }
 
 // SessionConfig is a struct that contains configuration of a connection session
@@ -23,6 +24,7 @@ type SessionConfig struct {
 	KeyHome string `json:"KeyHome"`
 	Port    string `json:"Port"`
 	IPAddr  string `json:"IPAddr"`
+	App     string `json:"App"`
 }
 
 // ParseServerConfig parses json file

@@ -9,13 +9,17 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/sap200/dvpn-node/client"
 	"github.com/sap200/dvpn-node/parser"
 	"github.com/sap200/dvpn-node/server"
 	"github.com/sap200/dvpn-node/utils"
+	"github.com/sap200/dvpn-node/webapp"
 	"github.com/tendermint/starport/starport/pkg/cosmosclient"
 )
+
+var wg sync.WaitGroup
 
 func main() {
 
@@ -87,11 +91,18 @@ func main() {
 		}
 
 		d, e := cc.Address(cfg.Account)
-		fmt.Println("Here: d", d)
-		fmt.Println("Here: e", e)
+		if e != nil {
+			log.Fatal(e)
+		}
 
+		// launch
 		utils.PrintServer()
-		server.LaunchServer(cc, cfg.Account, cfg.Port)
+		wg.Add(2)
+		fmt.Println("Starting webapp at port", cfg.App)
+		go webapp.NewApp(cfg.App, d.String(), cfg.Remote)
+
+		go server.LaunchServer(cc, cfg.Account, cfg.Port)
+		wg.Wait()
 
 	case "list-nodes":
 		queryCmd.Parse(os.Args[2:])
