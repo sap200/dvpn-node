@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/sap200/dvpn-node/client"
+	"github.com/sap200/dvpn-node/utils"
 	"github.com/sap200/vineyard/x/vineyard/types"
 )
 
@@ -19,14 +20,21 @@ func handle(w http.ResponseWriter, req *http.Request) {
 		log.Fatalln(err)
 	}
 
+	a, err := utils.ReadFile("/tmp/loggerd.log")
+	if err != nil {
+		log.Println(err)
+	}
+
 	type d struct {
 		Array   []types.Node
 		Account string
+		Logs    string
 	}
 
 	x := d{
 		Array:   nodeArr,
 		Account: accountName,
+		Logs:    string(a),
 	}
 
 	parsedTemplate, _ := template.ParseFiles("./webapp/templates/index.html")

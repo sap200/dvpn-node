@@ -45,10 +45,10 @@
     </div>
 
     <input type="radio" id="tabOptions" name="mytabs">
-    <label for="tabOptions">Options</label>
+    <label for="tabOptions">Logs</label>
     <div class="tab">
-      <h2>Options</h2>
-      <p>TBD</p>
+      <h2 class="heading">Logs</h2>
+      <p>{{.Logs}}</p>
     </div>
 
 
@@ -174,6 +174,17 @@ header {
     padding: 1rem;
     vertical-align: middle;
     color: white;
+}
+
+p {
+    background-color: #ffe;
+    border-radius: 0 0 12px 12px;
+    padding: 15px 15px 20px;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 5px 7px -1px rgba(51, 51, 51, 0.23);
+    transition: transform .25s cubic-bezier(.7,.98,.86,.98), box-shadow .25s cubic-bezier(.7,.98,.86,.98);
+    margin-bottom: 2px;
 }
 
 </style>
