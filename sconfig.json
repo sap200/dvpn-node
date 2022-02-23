@@ -1,10 +1,10 @@
 {
 	"Type": "session",
 	"Account": "bob",
-	"KeyHome": "/home/saptarsi/.vineyard",
+	"KeyHome": "~/.vineyard",
 	"Remote": "http://localhost:26657",
     "Port": "5000",
-    "IPAddr": "10.0.2.15"
+    "IPAddr": "139.162.253.127"
 
 }
 

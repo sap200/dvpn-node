@@ -1,7 +1,7 @@
 {
 	"Type": "server",
 	"Account": "bob",
-	"KeyHome": "/home/saptarsi/.vineyard",
+	"KeyHome": "~/.vineyard",
 	"Remote": "http://localhost:26657",
 	"Port": "5000"
 
