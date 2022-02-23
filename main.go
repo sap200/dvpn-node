@@ -86,6 +86,10 @@ func main() {
 			log.Fatalln(err)
 		}
 
+		d, e := cc.Address(cfg.Account)
+		fmt.Println("Here: d", d)
+		fmt.Println("Here: e", e)
+
 		utils.PrintServer()
 		server.LaunchServer(cc, cfg.Account, cfg.Port)
 
@@ -129,9 +133,11 @@ func main() {
 			log.Fatalln(err)
 		}
 
+		//fmt.Println("Address", add.String())
+
 		utils.PrintClient()
 		privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-		c := client.NewClient(*privKey, cfg.Remote+":"+cfg.Port, add.String())
+		c := client.NewClient(*privKey, cfg.IPAddr+":"+cfg.Port, add.String())
 		c.Connect()
 
 	default:
