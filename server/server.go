@@ -48,8 +48,6 @@ func LaunchServer(cc cosmosclient.Client, accountName string, port string) {
 
 	// init the variables
 	initVars()
-	// log the server start
-	fmt.Printf("Node started at port %s\n", port)
 
 	// on press of ctrl + c, do the basic cleanup before exiting the server
 	sigs := make(chan os.Signal)
