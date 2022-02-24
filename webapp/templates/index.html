@@ -78,6 +78,45 @@
       {{end}}
     </div>
 
+    <input type="radio" id="tabConnect" name="mytabs">
+    <label for="tabConnect">Connect</label>
+    <div class="tab">
+      {{if .Session}}
+
+        <p class="para"> Session has been formed. Look at logs</p>
+
+      {{else}}
+          <form method="POST" action="/connect">
+            <p class="sfm">
+              KeyHome
+            </p>
+            <input type="text" name="keyhome" class="sin" required><br>
+
+            <p class="sfm">
+              BlockChain Node 
+            </p>
+            <input type="text" name="remote" class="sin" required><br>
+
+            <p class="sfm">
+              Port
+            </p>
+          
+            <input type="text" name="port" class="sin"><br>
+
+            <p class="sfm">
+              IP Address
+            </p>
+          
+            <input type="text" name="ip" class="sin"><br>
+
+            <p class="sfm">
+
+            </p>
+            <input type="submit" value="submit" class="glow-on-hover">
+          </form>
+      {{end}}
+    </div>
+
 
   </div>
 </body>
