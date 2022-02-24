@@ -12,6 +12,7 @@ import (
 
 var accountName string
 var queryNode string
+var loggerFile string
 
 func handle(w http.ResponseWriter, req *http.Request) {
 
@@ -20,7 +21,7 @@ func handle(w http.ResponseWriter, req *http.Request) {
 		log.Fatalln(err)
 	}
 
-	a, err := utils.ReadFile("/tmp/loggerd.log")
+	a, err := utils.ReadFile(loggerFile)
 	if err != nil {
 		log.Println(err)
 	}
@@ -46,9 +47,10 @@ func handle(w http.ResponseWriter, req *http.Request) {
 
 // NewApp makes a new HTTP app
 // This is frontend for our VPN
-func NewApp(port, accName, qNode string) {
+func NewApp(port, accName, qNode, logFile string) {
 	accountName = accName
 	queryNode = qNode
+	loggerFile = logFile
 	http.HandleFunc("/", handle)
 	log.Fatalln(http.ListenAndServe("localhost:"+port, nil))
 }

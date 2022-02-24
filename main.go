@@ -49,6 +49,10 @@ func main() {
 	//nodeID := connectCmd.String("ip", "", "ip address of the vpn node")
 	//accountName1 := connectCmd.String("account", "", "cosmos account name")
 
+	// for the webapp
+	webCmd := flag.NewFlagSet("webapp", flag.ContinueOnError)
+	webConf := webCmd.String("config", "", "configuration file")
+
 	flag.Parse()
 
 	if len(os.Args) < 2 {
@@ -90,20 +94,10 @@ func main() {
 			log.Fatalln(err)
 		}
 
-		d, e := cc.Address(cfg.Account)
-		if e != nil {
-			log.Fatal(e)
-		}
-
 		// launch
 		utils.PrintServer()
-		wg.Add(2)
-		fmt.Println("Starting webapp at port", cfg.App)
-		go webapp.NewApp(cfg.App, d.String(), cfg.Remote)
 
-		go server.LaunchServer(cc, cfg.Account, cfg.Port)
-		wg.Wait()
-
+		server.LaunchServer(cc, cfg.Account, cfg.Port)
 	case "list-nodes":
 		queryCmd.Parse(os.Args[2:])
 
@@ -151,6 +145,35 @@ func main() {
 		c := client.NewClient(*privKey, cfg.IPAddr+":"+cfg.Port, add.String())
 		c.Connect()
 
+	case "webapp":
+		webCmd.Parse(os.Args[2:])
+		if *webConf == "" {
+			webCmd.PrintDefaults()
+			os.Exit(1)
+		}
+
+		cfg, err := parser.ParseWebAppConfig(*webConf)
+		if err != nil {
+			panic(err)
+		}
+
+		cc, err := cosmosclient.New(context.Background(),
+			cosmosclient.WithNodeAddress(cfg.QNode),
+			cosmosclient.WithHome(cfg.KeyHome),
+		)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		add, err := cc.Address(cfg.Account)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		// Launch the webapp
+		fmt.Println("Running app at", cfg.Port)
+		webapp.NewApp(cfg.Port, add.String(), cfg.QNode, cfg.LogPath)
 	default:
 		log.Println("Invalid command")
 		printUsage()
@@ -165,4 +188,5 @@ func printUsage() {
 	fmt.Println("server\n\t-for launching a server")
 	fmt.Println("list-nodes\n\t-for listing available nodes")
 	fmt.Println("connect\n\t-for connecting to available nodes")
+	fmt.Println("webapp\n\t-for launching the webapp")
 }

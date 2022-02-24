@@ -13,7 +13,6 @@ type ServerConfig struct {
 	Remote  string `json:"Remote"`
 	KeyHome string `json:"KeyHome"`
 	Port    string `json:"Port"`
-	App     string `json:"App"`
 }
 
 // SessionConfig is a struct that contains configuration of a connection session
@@ -24,7 +23,15 @@ type SessionConfig struct {
 	KeyHome string `json:"KeyHome"`
 	Port    string `json:"Port"`
 	IPAddr  string `json:"IPAddr"`
-	App     string `json:"App"`
+}
+
+// WebAppConfig contains configuration for web based interface
+type WebAppConfig struct {
+	Port    string `json:"Port"`
+	QNode   string `json:"QNode"`
+	Account string `json:"Account"`
+	LogPath string `json:"LogPath"`
+	KeyHome string `json:"KeyHome"`
 }
 
 // ParseServerConfig parses json file
@@ -56,6 +63,23 @@ func ParseSessionConfig(path string) (*SessionConfig, error) {
 
 	// try unmarshalling
 	var config SessionConfig
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// ParseWebAppConfig parses the web app configuration
+func ParseWebAppConfig(path string) (*WebAppConfig, error) {
+	data, err := utils.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	// try unmarshalling
+	var config WebAppConfig
 	err = json.Unmarshal(data, &config)
 	if err != nil {
 		return nil, err

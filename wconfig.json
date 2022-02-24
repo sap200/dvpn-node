@@ -1,0 +1,7 @@
+{
+    "Port": "8000",
+    "QNode": "http://localhost:26657",
+    "Account": "bob",
+    "LogPath": "/tmp/logger_dvpn.log",
+    "KeyHome": "/home/saptarsi/.vineyard"
+}

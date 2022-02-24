@@ -18,8 +18,7 @@ func TestParseServerConfig(t *testing.T) {
 	"Account": "alice",
 	"Remote": "http://localhost:26657",
 	"KeyHome": "/home/sapta/vineyard",
-	"Port": "5899",
-	"App": "8000"
+	"Port": "5899"
 }`
 
 	f.Write([]byte(d))
@@ -32,11 +31,6 @@ func TestParseServerConfig(t *testing.T) {
 	os.Remove(name)
 
 	//fmt.Println(pc)
-
-	if pc.App != "8000" {
-		t.Fatalf("App-port mismatch: Expected %s, got %s\n", "8000", pc.App)
-
-	}
 
 	if pc.Type != "server" {
 		t.Fatalf("Type mismatch: Expected %s, got %s\n", "server", pc.Account)
@@ -73,8 +67,7 @@ func TestParseSessionConfig(t *testing.T) {
 	"Remote": "192.13.14.21",
 	"KeyHome": "/home/sapta/vineyard",
 	"Port": "5989",
-	"IPAddr": "10.0.2.18",
-	"App": "8000"
+	"IPAddr": "10.0.2.18"
 }`
 
 	f.Write([]byte(d))
@@ -85,10 +78,6 @@ func TestParseSessionConfig(t *testing.T) {
 	}
 
 	os.Remove(name)
-
-	if pc.App != "8000" {
-		t.Fatalf("App-port mismatch: Expected %s, got %s\n", "8000", pc.App)
-	}
 
 	if pc.Type != "session" {
 		t.Fatalf("Type mismatch: Expected %s, got %s\n", "session", pc.Account)
@@ -112,6 +101,52 @@ func TestParseSessionConfig(t *testing.T) {
 
 	if pc.IPAddr != "10.0.2.18" {
 		t.Fatalf("IPAddr mismatch: Expected %s, got %s\n", "10.0.2.18", pc.IPAddr)
+	}
+
+}
+
+func TestWebAppConfig(t *testing.T) {
+	name := "test_w.json"
+	f, err := os.Create(name)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	d := `{
+		"Account": "alice",
+		"Port": "8000",
+		"QNode": "http://localhost:26657",
+		"LogPath": "/tmp/logger.log",
+		"KeyHome": "/home/sapta/.vineyard"
+}`
+
+	f.Write([]byte(d))
+
+	pc, err := ParseWebAppConfig(name)
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	os.Remove(name)
+
+	if pc.Account != "alice" {
+		t.Fatalf("Account mismatch: Expected %s, got %s\n", "alice", pc.Account)
+	}
+
+	if pc.Port != "8000" {
+		t.Fatalf("Port mismatch: Expected %s, got %s\n", "8000", pc.Port)
+	}
+
+	if pc.QNode != "http://localhost:26657" {
+		t.Fatalf("QNode mismatch: Expected %s, got %s\n", "http://localhost:26657", pc.QNode)
+	}
+
+	if pc.LogPath != "/tmp/logger.log" {
+		t.Fatalf("LogPath mismatch: Expected %s, got %s\n", "/tmp/logger.log", pc.LogPath)
+	}
+
+	if pc.KeyHome != "/home/sapta/.vineyard" {
+		t.Fatalf("KeyHome mismatch: Expected %s, got %s\n", "/home/sapta/.vineyard", pc.KeyHome)
 	}
 
 }
