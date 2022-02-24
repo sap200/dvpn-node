@@ -3,7 +3,6 @@
 	"Account": "bob",
 	"KeyHome": "/home/saptarsi/.vineyard",
 	"Remote": "http://localhost:26657",
-	"Port": "5000",
-	"App": "8000"
+	"Port": "5000"
 }
 

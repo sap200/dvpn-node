@@ -173,7 +173,7 @@ func main() {
 
 		// Launch the webapp
 		fmt.Println("Running app at", cfg.Port)
-		webapp.NewApp(cfg.Port, add.String(), cfg.QNode, cfg.LogPath)
+		webapp.NewApp(cfg.Port, add.String(), cfg.Account, cfg.QNode, cfg.LogPath)
 	default:
 		log.Println("Invalid command")
 		printUsage()
