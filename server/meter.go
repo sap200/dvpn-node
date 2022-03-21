@@ -22,8 +22,6 @@ func telemeterBandwidth(cc cosmosclient.Client, accountName string) {
 		return
 	}
 
-	_, _ = bdwth, accountAddress
-
 	// get the server info by id
 	// that is UUIDOfServer
 	qc := types.NewQueryClient(cc.Context)
