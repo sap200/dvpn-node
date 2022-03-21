@@ -23,18 +23,22 @@ var accountUserName string
 var isServerRunning bool
 var hasConnection bool
 
+// handle has arguments writer and reader (writer is the interface which has write function)
 func handle(w http.ResponseWriter, req *http.Request) {
 
+	// to list all the nodes
 	nodeArr, err := client.QueryAll(queryNode)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	// to read the logfile created in NewApp()
 	a, err := utils.ReadFile(loggerFile)
 	if err != nil {
 		log.Println(err)
 	}
 
+	// struct declaration with details to be used and taken from index.html
 	type d struct {
 		Array   []types.Node
 		Account string
@@ -43,6 +47,7 @@ func handle(w http.ResponseWriter, req *http.Request) {
 		Session bool
 	}
 
+	// creation of x type struct
 	x := d{
 		Array:   nodeArr,
 		Account: accountName,
@@ -51,7 +56,9 @@ func handle(w http.ResponseWriter, req *http.Request) {
 		Session: hasConnection,
 	}
 
+	// parsing index.html template so that from here values can reach there
 	parsedTemplate, _ := template.ParseFiles("./webapp/templates/index.html")
+	// here we execute the parsing function with w as http response writer
 	err = parsedTemplate.Execute(w, x)
 	if err != nil {
 		log.Println(err)
@@ -59,13 +66,17 @@ func handle(w http.ResponseWriter, req *http.Request) {
 }
 
 func handleServer(w http.ResponseWriter, req *http.Request) {
+	// used to read and request data filled into the html file using reader function req
 	kh := req.FormValue("keyhome")
 	rm := req.FormValue("remote")
 	prt := req.FormValue("port")
+	// used to strip
 	kh = strings.Trim(kh, " ")
 	rm = strings.Trim(rm, " ")
 	prt = strings.Trim(prt, " ")
 
+	// creating new RPC cosmos client
+	// context.background is to run till the main program ends
 	cc, err := cosmosclient.New(context.Background(),
 		cosmosclient.WithNodeAddress(rm),
 		cosmosclient.WithHome(kh),
@@ -76,7 +87,7 @@ func handleServer(w http.ResponseWriter, req *http.Request) {
 
 	isServerRunning = true
 
-	// launched a server
+	// launched a zovino server goroutine
 	go server.LaunchServer(cc, accountUserName, prt)
 
 	nodeArr, err := client.QueryAll(queryNode)
@@ -134,11 +145,14 @@ func handleConnection(w http.ResponseWriter, req *http.Request) {
 		log.Println(err)
 	}
 
+	// used to show the cosmos address for the given keyname
 	add, err := cc.Address(accountUserName)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	// generating a private public key pair for handshake
+	// check handshake
 	privKey, _ := rsa.GenerateKey(rand.Reader, 2048)
 	c := client.NewClient(*privKey, ipaddr+":"+port, add.String())
 	go c.Connect()
@@ -182,6 +196,9 @@ func handleConnection(w http.ResponseWriter, req *http.Request) {
 // NewApp makes a new HTTP app
 // This is frontend for our VPN
 func NewApp(port, accName, accUserName, qNode, logFile string) {
+
+	// starts here
+
 	// initialize variables
 	accountName = accName
 	queryNode = qNode
@@ -190,11 +207,17 @@ func NewApp(port, accName, accUserName, qNode, logFile string) {
 	isServerRunning = false
 	hasConnection = false
 
+	// available handle functions "/" is the path
+
 	// the router
 	http.HandleFunc("/", handle)
+
+	// automatically redirected to this per tab
 	http.HandleFunc("/launcher", handleServer)
 	http.HandleFunc("/connect", handleConnection)
 
+	// this is used to start up and running a http servere at the specified port
+	// (fatal ln is to log and return if there is any error)
 	// the server
 	log.Fatalln(http.ListenAndServe("localhost:"+port, nil))
 }
