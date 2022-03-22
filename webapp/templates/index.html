@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <title>Zovino</title>
@@ -36,7 +37,16 @@
     <label for="tabStats">Stats</label>
     <div class="tab">
       <h2>Performance Metrics</h2>
-      <p class="para">TBD</p>
+      <p class="para">
+        <b> Time vs Speed </b>
+        <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
+      </p>
+
+      <p class="para">
+        <b> Speed vs Instance </b>
+        <canvas id="myChart1" style="width:100%;max-width:700px"></canvas>
+      </p>
+
     </div>
 
     <input type="radio" id="tabOptions" name="mytabs">
@@ -120,6 +130,80 @@
 
 
   </div>
+<!-- 
+  Script here -->
+
+  <script>
+    var url = "http://localhost:1317/sap200/vineyard/vineyard/node";
+    fetch(url).then(function(response) {
+      return response.json();
+    }).then(function(data) {
+      var bwth = data.node[0].bandwidth;
+      var bArr = bwth.split(" ");
+      bArr.pop();
+      let ds = [];
+      let us = [];
+      let timer = [];
+      let ltncy = [];
+      // loop over it
+      for(let i = 0; i < bArr.length; i++) {
+        let arr = bArr[i].split(",");
+        timer.push(i);
+        ds.push(arr[1]);
+        us.push(arr[2]);
+        ltncy.push(arr[0].slice(0, arr[0].length-2));
+      }
+
+      console.log(ds, us, timer);
+      console.log(ltncy);
+
+      // make your chart here
+
+      new Chart("myChart", {
+        type: "line",
+        data: {
+          labels: timer,
+          datasets: [{ 
+            data: us,
+            borderColor: "red",
+            fill: false,
+            label: "upload-speed"
+          }, { 
+            data: ds,
+            borderColor: "blue",
+            fill: false,
+            label: "download-speed"
+          }]
+        },
+        options: {
+          legend: {display: true}
+        }
+      });
+
+      new Chart("myChart1", {
+        type: "line",
+        data: {
+          labels: timer,
+          datasets: [{ 
+            data: ltncy,
+            borderColor: "green",
+            fill: false,
+            label: "Latency"
+          }]
+        },
+        options: {
+          legend: {display: true}
+        }
+      });
+
+
+
+
+
+    });
+
+    </script>
+
 </body>
 </html>
 

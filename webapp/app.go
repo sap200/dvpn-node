@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/sap200/dvpn-node/client"
@@ -22,6 +23,35 @@ var loggerFile string
 var accountUserName string
 var isServerRunning bool
 var hasConnection bool
+var timer []int
+var uploadSpeed []float64
+var downloadSpeed []float64
+
+func retrieveBandwidth(serverID string) {
+	nodeArr, err := client.QueryAll(queryNode)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// from the query node, get your current server
+	var n types.Node
+	for _, v := range nodeArr {
+		if v.Index == serverID {
+			n = v
+		}
+	}
+
+	band := n.Bandwidth
+	data := strings.Split(band, " ")
+	for i := 0; i < len(data)-1; i++ {
+		arr := strings.Split(data[i], ",")
+		us, _ := strconv.ParseFloat(arr[2], 64)
+		uploadSpeed = append(uploadSpeed, us)
+		ds, _ := strconv.ParseFloat(data[1], 64)
+		downloadSpeed = append(downloadSpeed, ds)
+	}
+
+}
 
 // handle has arguments writer and reader (writer is the interface which has write function)
 func handle(w http.ResponseWriter, req *http.Request) {
@@ -45,6 +75,7 @@ func handle(w http.ResponseWriter, req *http.Request) {
 		Logs    string
 		Status  bool
 		Session bool
+		Sid     string
 	}
 
 	// creation of x type struct
@@ -54,6 +85,7 @@ func handle(w http.ResponseWriter, req *http.Request) {
 		Logs:    string(a),
 		Status:  isServerRunning,
 		Session: hasConnection,
+		Sid:     server.UUIDOfServer,
 	}
 
 	// parsing index.html template so that from here values can reach there
@@ -100,12 +132,16 @@ func handleServer(w http.ResponseWriter, req *http.Request) {
 		log.Println(err)
 	}
 
+	// get current server status
+	retrieveBandwidth(server.UUIDOfServer)
+
 	type d struct {
 		Array   []types.Node
 		Account string
 		Logs    string
 		Status  bool
 		Session bool
+		Sid     string
 	}
 
 	x := d{
@@ -114,6 +150,7 @@ func handleServer(w http.ResponseWriter, req *http.Request) {
 		Logs:    string(a),
 		Status:  isServerRunning,
 		Session: hasConnection,
+		Sid:     server.UUIDOfServer,
 	}
 
 	parsedTemplate, _ := template.ParseFiles("./webapp/templates/index.html")
@@ -169,12 +206,16 @@ func handleConnection(w http.ResponseWriter, req *http.Request) {
 		log.Println(err)
 	}
 
+	// get current server status
+	retrieveBandwidth(server.UUIDOfServer)
+
 	type d struct {
 		Array   []types.Node
 		Account string
 		Logs    string
 		Status  bool
 		Session bool
+		Sid     string
 	}
 
 	x := d{
@@ -183,6 +224,7 @@ func handleConnection(w http.ResponseWriter, req *http.Request) {
 		Logs:    string(a),
 		Status:  isServerRunning,
 		Session: hasConnection,
+		Sid:     server.UUIDOfServer,
 	}
 
 	parsedTemplate, _ := template.ParseFiles("./webapp/templates/index.html")
