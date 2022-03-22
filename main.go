@@ -112,7 +112,7 @@ func main() {
 			bArr := strings.Split(v.Bandwidth, " ")
 			data := bArr[len(bArr)-2]
 			res := strings.Split(data, ",")
-			fmt.Println("ID:", v.Index, "\tIP:", v.Address, "\tLocation: ", v.Location, "\tLatency: ", res[0], "\tDownload: ", res[1]+"Mbps\tUpload: ", res[2]+"Mbps")
+			fmt.Println("ID:", v.Index, "\tIP:", v.Address, "\tLocation:", v.Location, "\tLatency:", res[0], "\tDownload:", res[1]+"Mbps", "\tUpload:", res[2]+"Mbps")
 			fmt.Println()
 		}
 
