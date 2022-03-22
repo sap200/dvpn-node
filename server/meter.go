@@ -5,6 +5,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/sap200/dvpn-node/utils"
 	"github.com/sap200/vineyard/x/vineyard/types"
@@ -61,4 +62,11 @@ func telemeterBandwidth(cc cosmosclient.Client, accountName string) {
 
 	// done updating
 
+}
+
+func updateBandwidth(cc cosmosclient.Client, accountName string) {
+	for {
+		telemeterBandwidth(cc, accountName)
+		time.Sleep(240 * time.Second)
+	}
 }

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/sap200/dvpn-node/client"
@@ -108,7 +109,10 @@ func main() {
 
 		fmt.Println()
 		for _, v := range nodeArr {
-			fmt.Println("ID:", v.Index, "\tIP:", v.Address, "\tLocation: ", v.Location)
+			bArr := strings.Split(v.Bandwidth, " ")
+			data := bArr[len(bArr)-2]
+			res := strings.Split(data, ",")
+			fmt.Println("ID:", v.Index, "\tIP:", v.Address, "\tLocation: ", v.Location, "\tLatency: ", res[0], "\tDownload: ", res[1]+"Mbps\tUpload: ", res[2]+"Mbps")
 			fmt.Println()
 		}
 

@@ -54,6 +54,9 @@ func LaunchServer(cc cosmosclient.Client, accountName string, port string) {
 	signal.Notify(sigs, os.Interrupt, syscall.SIGTERM)
 	go cleanup(sigs, cc, accountName)
 
+	// start the process of updating node
+	go updateBandwidth(cc, accountName)
+
 	// start the listener
 	ln, err := net.Listen("tcp", ":"+port)
 	if err != nil {
