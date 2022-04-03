@@ -13,5 +13,3 @@ go version
 curl https://get.starport.network/starport@v0.18.1 | bash
 cp starport /usr/local/bin
 
-# copy vineyard
-git clone https://github.com/sap200/vineyard ../.
